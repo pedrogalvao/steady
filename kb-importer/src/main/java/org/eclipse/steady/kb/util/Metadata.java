@@ -24,11 +24,17 @@ import java.io.IOException;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 
+import org.yaml.snakeyaml.Yaml;
+
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.steady.kb.model.Commit;
 import org.eclipse.steady.kb.model.Vulnerability;
 import org.eclipse.steady.shared.util.FileUtil;
+import java.lang.reflect.Constructor;
+
+
 
 /**
  * Metadata
@@ -83,6 +89,11 @@ public class Metadata {
               + filePath);
     }
 
+		String extension = FilenameUtils.getExtension(filePath);
+    if (extension.equalsIgnoreCase("yaml")) {
+      return getFromYaml(filePath);
+    }
+
     Gson gson = new Gson();
     Vulnerability metadata = null;
     metadata = gson.fromJson(FileUtil.readFile(filePath), Vulnerability.class);
@@ -94,4 +105,14 @@ public class Metadata {
 
     return metadata;
   }
+
+  public static Vulnerability getFromYaml(String filePath) throws java.io.IOException {
+    //new Constructor(Vulnerability.class)
+    Yaml yaml = new Yaml();
+    Vulnerability vulnerability = yaml.load(FileUtil.readFile(filePath));
+    System.out.println(vulnerability);
+
+    return vulnerability;
+  }
+
 }
